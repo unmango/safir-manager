@@ -9,4 +9,8 @@
     <PackageReference Include="MinVer" Version="2.4.0" PrivateAssets="all" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Manager.Protos\Manager.Protos.csproj" />
+  </ItemGroup>
+
 </Project>

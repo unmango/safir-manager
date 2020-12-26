@@ -2,7 +2,7 @@
 
 namespace Manager.Client
 {
-    public class Class1
+    public class GreeterClient : Greeter.GreeterClient
     {
     }
 }
