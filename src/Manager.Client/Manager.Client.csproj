@@ -12,8 +12,4 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Manager.Protos\Manager.Protos.csproj" />
-  </ItemGroup>
-
 </Project>

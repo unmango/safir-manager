@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Manager.Protos\Manager.Protos.csproj" />
+    <Folder Include="Services" />
   </ItemGroup>
 
 </Project>
