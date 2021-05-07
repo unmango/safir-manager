@@ -1,7 +1,11 @@
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 
+ARG GithubUsername
+ARG GithubPassword
+
 WORKDIR /build
 COPY src/Safir.Manager/*.csproj .
+COPY NuGet.Config .
 RUN dotnet restore
 
 COPY src/Safir.Manager/ .
