@@ -14,7 +14,7 @@ services:
     ports:
     - 6969:80
     environment:
-      Redis: localhost:6379
+      Redis: redis:6379
     volumes:
     - ~/Music:/data
     depends_on:
