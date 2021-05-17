@@ -30,8 +30,6 @@ namespace Safir.Manager
                 options.ConnectionString = Configuration["Redis"];
             });
             services.AddEventHandler<FileCreatedHandler>();
-
-            // services.AddHostedService<TestService>();
         }
 
         public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
