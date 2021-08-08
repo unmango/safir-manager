@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Safir.Agent.Client.DependencyInjection;
+using Safir.Manager.Agents;
 using Safir.Manager.Events;
 using Safir.Messaging.DependencyInjection;
 using Serilog;
@@ -25,9 +27,14 @@ namespace Safir.Manager
             services.AddGrpc();
             services.AddGrpcReflection();
 
-            services.AddSafirAgentClient();
             services.AddSafirMessaging(options => {
                 options.ConnectionString = Configuration["Redis"];
+            });
+
+            services.AddSingleton<DefaultAgentFactory>();
+            services.AddSingleton(s => {
+                var factory = s.GetRequiredService<DefaultAgentFactory>();
+                return factory.CreateAll();
             });
             services.AddEventHandler<FileCreatedHandler>();
         }
