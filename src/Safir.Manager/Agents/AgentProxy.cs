@@ -1,18 +1,22 @@
 using System;
+using Grpc.Net.ClientFactory;
 using Safir.Agent.Client;
 
 namespace Safir.Manager.Agents
 {
     public class AgentProxy : IAgent
     {
-        public AgentProxy(IFileSystemClient fileSystem, IHostClient host)
+        private readonly Lazy<IFileSystemClient> _fileSystem;
+        private readonly Lazy<IHostClient> _host;
+
+        public AgentProxy(string name, GrpcClientFactory factory)
         {
-            FileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
-            Host = host ?? throw new ArgumentNullException(nameof(host));
+            _fileSystem = new(() => factory.CreateFileSystemClient(name));
+            _host = new(() => factory.CreateHostClient(name));
         }
 
-        public IFileSystemClient FileSystem { get; }
-        
-        public IHostClient Host { get; }
+        public IFileSystemClient FileSystem => _fileSystem.Value;
+
+        public IHostClient Host => _host.Value;
     }
 }
