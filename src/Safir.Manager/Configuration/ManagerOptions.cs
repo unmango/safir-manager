@@ -8,7 +8,7 @@ namespace Safir.Manager.Configuration
     [UsedImplicitly(ImplicitUseTargetFlags.WithMembers)]
     public class ManagerOptions
     {
-        public IEnumerable<AgentOptions> Agents { get; set; }
+        public List<AgentOptions> Agents { get; set; } = new();
 
         public string Redis { get; set; } = string.Empty;
     }
