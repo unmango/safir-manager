@@ -41,12 +41,11 @@ namespace Safir.Manager
                     options.Address = new Uri(agent.BaseUrl);
                 });
 
-                services.AddTransient<IAgent>(s => {
-                    var factory = s.GetRequiredService<GrpcClientFactory>();
-                    return new AgentProxy(name, factory);
-                });
+                services.AddTransient(
+                    s => s.GetRequiredService<AgentFactory>().Create(name));
             }
-            
+
+            services.AddTransient<DefaultAgentAggregator>();
             services.AddEventHandler<FileCreatedHandler>();
         }
 
