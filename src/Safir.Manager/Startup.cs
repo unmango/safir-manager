@@ -10,6 +10,7 @@ using Safir.Agent.Client.DependencyInjection;
 using Safir.Manager.Agents;
 using Safir.Manager.Configuration;
 using Safir.Manager.Events;
+using Safir.Manager.Services;
 using Safir.Messaging.DependencyInjection;
 using Serilog;
 
@@ -57,9 +58,11 @@ namespace Safir.Manager
             }
 
             app.UseSerilogRequestLogging();
+            
             app.UseRouting();
-
             app.UseEndpoints(endpoints => {
+                endpoints.MapGrpcService<MediaService>();
+                
                 if (env.IsDevelopment())
                 {
                     endpoints.MapGrpcReflectionService();
