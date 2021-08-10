@@ -34,6 +34,7 @@ namespace Safir.Manager
                 options.ConnectionString = Configuration["Redis"];
             });
 
+            services.AddSingleton<AgentFactory>();
             var managerOptions = Configuration.Get<ManagerOptions>();
             foreach (var agent in managerOptions.Agents)
             {
