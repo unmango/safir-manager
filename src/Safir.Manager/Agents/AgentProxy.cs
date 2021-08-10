@@ -4,7 +4,7 @@ using Safir.Agent.Client;
 
 namespace Safir.Manager.Agents
 {
-    public class AgentProxy : IAgent
+    internal class AgentProxy : IAgent
     {
         private readonly Lazy<IFileSystemClient> _fileSystem;
         private readonly Lazy<IHostClient> _host;
@@ -13,10 +13,14 @@ namespace Safir.Manager.Agents
         {
             _fileSystem = new(() => factory.CreateFileSystemClient(name));
             _host = new(() => factory.CreateHostClient(name));
+
+            Name = name ?? throw new ArgumentNullException(nameof(name));
         }
 
         public IFileSystemClient FileSystem => _fileSystem.Value;
 
         public IHostClient Host => _host.Value;
+        
+        public string Name { get; }
     }
 }

@@ -7,5 +7,7 @@ namespace Safir.Manager.Agents
         IFileSystemClient FileSystem { get; }
         
         IHostClient Host { get; }
+        
+        string Name { get; }
     }
 }

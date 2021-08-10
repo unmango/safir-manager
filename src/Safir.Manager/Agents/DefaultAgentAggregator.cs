@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Safir.Agent.Protos;
+using Safir.Manager.Protos;
 
 namespace Safir.Manager.Agents
 {
@@ -15,13 +16,15 @@ namespace Safir.Manager.Agents
             _agents = agents ?? throw new ArgumentNullException(nameof(agents));
         }
 
-        public IAsyncEnumerable<FileSystemEntry> ListAsync(CancellationToken cancellationToken)
+        public IAsyncEnumerable<MediaItem> List(CancellationToken cancellationToken)
         {
             return _agents.ToAsyncEnumerable()
-                .SelectMany(x => x.FileSystem.ListAsync(cancellationToken))
-                // Janky DistinctBy
-                .GroupBy(x => x.Path)
-                .SelectAwait(x => x.FirstAsync(cancellationToken));
+                .SelectMany(x => x.FileSystem.ListAsync(cancellationToken), ToMedia);
+
+            static MediaItem ToMedia(IAgent agent, FileSystemEntry entry) => new() {
+                Host = agent.Name,
+                Path = entry.Path,
+            };
         }
     }
 }
