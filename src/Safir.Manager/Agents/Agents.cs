@@ -7,7 +7,7 @@ namespace Safir.Manager.Agents
     {
         private readonly Dictionary<string, IAgent> _agents;
 
-        public Agents()
+        public Agents(IEnumerable<IAgent> agents)
         {
             _agents = new();
         }
