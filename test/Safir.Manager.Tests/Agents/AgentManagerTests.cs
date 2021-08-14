@@ -15,11 +15,15 @@ namespace Safir.Manager.Tests.Agents
     {
         private readonly AutoMocker _mocker = new();
         private readonly Mock<IOptionsMonitor<ManagerOptions>> _optionsMonitor;
+        private Action<ManagerOptions, string>? _changeCallback;
         private readonly AgentManager _manager;
 
         public AgentManagerTests()
         {
             _optionsMonitor = _mocker.GetMock<IOptionsMonitor<ManagerOptions>>();
+            _optionsMonitor.Setup(x => x.OnChange(It.IsAny<Action<ManagerOptions, string>>()))
+                .Callback<Action<ManagerOptions, string>>(x => _changeCallback = x);
+
             _manager = _mocker.CreateInstance<AgentManager>();
         }
 
@@ -99,27 +103,26 @@ namespace Safir.Manager.Tests.Agents
         }
 
         // TODO
-        // [Fact]
-        // public void CreatesNewAgentWhenOptionsChange()
-        // {
-        //     Action<ManagerOptions>? callback = null;
-        //     _optionsMonitor.Setup(x => x.OnChange(It.IsAny<Action<ManagerOptions>>()))
-        //         .Callback<Action<ManagerOptions>>(x => callback = x);
-        //
-        //     // Enumerate to trigger initial create
-        //     var _ = _manager.Count();
-        //     
-        //     Assert.NotNull(callback);
-        //
-        //     callback!(new() {
-        //         Agents = new() {
-        //             new() {
-        //                 BaseUrl = "https://TestUrl69"
-        //             }
-        //         }
-        //     });
-        //     
-        //     Assert.NotNull(_manager["https://TestUrl69"]);
-        // }
+        [Fact]
+        public void CreatesNewAgentWhenOptionsChange()
+        {
+            _optionsMonitor.SetupGet(x => x.CurrentValue)
+                .Returns(new ManagerOptions { Agents = new() });
+
+            // Enumerate to trigger initial create
+            var _ = _manager.Count();
+
+            Assert.NotNull(_changeCallback);
+
+            _changeCallback!(new() {
+                Agents = new() {
+                    new() {
+                        BaseUrl = "https://TestUrl69"
+                    }
+                }
+            }, "doesn't matter");
+
+            Assert.NotNull(_manager["https://TestUrl69"]);
+        }
     }
 }
