@@ -97,5 +97,26 @@ namespace Safir.Manager.Tests.Agents
                 }
             };
         }
+
+        // TODO
+        // [Fact]
+        // public void CreatesNewAgentWhenOptionsChange()
+        // {
+        //     Action<ManagerOptions>? callback = null;
+        //     _optionsMonitor.Setup(x => x.OnChange(It.IsAny<Action<ManagerOptions>>()))
+        //         .Callback<Action<ManagerOptions>>(x => callback = x);
+        //     
+        //     Assert.NotNull(callback);
+        //
+        //     callback!(new() {
+        //         Agents = new() {
+        //             new() {
+        //                 BaseUrl = "https://TestUrl69"
+        //             }
+        //         }
+        //     });
+        //     
+        //     Assert.NotNull(_manager["https://TestUrl69"]);
+        // }
     }
 }
