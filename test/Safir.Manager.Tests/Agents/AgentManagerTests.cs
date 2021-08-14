@@ -105,6 +105,9 @@ namespace Safir.Manager.Tests.Agents
         //     Action<ManagerOptions>? callback = null;
         //     _optionsMonitor.Setup(x => x.OnChange(It.IsAny<Action<ManagerOptions>>()))
         //         .Callback<Action<ManagerOptions>>(x => callback = x);
+        //
+        //     // Enumerate to trigger initial create
+        //     var _ = _manager.Count();
         //     
         //     Assert.NotNull(callback);
         //
