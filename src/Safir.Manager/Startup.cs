@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
@@ -54,8 +54,8 @@ namespace Safir.Manager
                     s => s.GetRequiredService<AgentFactory>().Create(name));
             }
 
-            services.AddTransient<IAgents, Agents.Agents>();
-            services.AddTransient<IEnumerable<IAgent>, Agents.Agents>();
+            services.AddTransient<IAgents, AgentManager>();
+            services.AddTransient<IEnumerable<IAgent>, AgentManager>();
 
             services.AddTransient<AgentAggregator>();
             services.AddEventHandler<FileCreatedHandler>();
