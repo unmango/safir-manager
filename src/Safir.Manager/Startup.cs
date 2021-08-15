@@ -45,13 +45,9 @@ namespace Safir.Manager
             var managerOptions = Configuration.Get<ManagerOptions>();
             foreach (var agent in managerOptions.Agents)
             {
-                var name = agent.BaseUrl;
-                services.AddSafirAgentClient(name, options => {
+                services.AddSafirAgentClient(agent.Name, options => {
                     options.Address = new Uri(agent.BaseUrl);
                 });
-
-                services.AddTransient(
-                    s => s.GetRequiredService<AgentFactory>().Create(name));
             }
 
             services.AddTransient<IAgents, AgentManager>();

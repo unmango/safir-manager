@@ -15,6 +15,8 @@ namespace Safir.Manager.Tests.Agents
     {
         private readonly AutoMocker _mocker = new();
         private readonly Mock<IOptionsMonitor<ManagerOptions>> _optionsMonitor;
+        private readonly Mock<AgentFactory> _agentFactory;
+        private readonly Mock<IAgent> _agent = new();
         private Action<ManagerOptions, string>? _changeCallback;
         private readonly AgentManager _manager;
 
@@ -24,6 +26,10 @@ namespace Safir.Manager.Tests.Agents
             _optionsMonitor.Setup(x => x.OnChange(It.IsAny<Action<ManagerOptions, string>>()))
                 .Callback<Action<ManagerOptions, string>>(x => _changeCallback = x);
 
+            _agentFactory = _mocker.GetMock<AgentFactory>();
+            _agentFactory.Setup(x => x.Create(It.IsAny<string>()))
+                .Returns(_agent.Object);
+
             _manager = _mocker.CreateInstance<AgentManager>();
         }
 
@@ -31,10 +37,13 @@ namespace Safir.Manager.Tests.Agents
         public void Throws_WhenArgsAreNull()
         {
             Assert.Throws<ArgumentNullException>(
-                () => new AgentManager(null!, new Mock<ILogger<AgentManager>>().Object));
-
+                () => new AgentManager(_optionsMonitor.Object, null!, null!));
+            
             Assert.Throws<ArgumentNullException>(
-                () => new AgentManager(new Mock<IOptionsMonitor<ManagerOptions>>().Object, null!));
+                () => new AgentManager(null!, _agentFactory.Object, null!));
+            
+            Assert.Throws<ArgumentNullException>(
+                () => new AgentManager(null!, null!, new Mock<ILogger<AgentManager>>().Object));
         }
 
         [Theory]
@@ -53,31 +62,33 @@ namespace Safir.Manager.Tests.Agents
 
         [Theory]
         [MemberData(nameof(AgentOptionsTestData))]
-        public void UsesBaseUrlAsName(IEnumerable<AgentOptions> agentOptions, IEnumerable<string> urls)
+        public void UsesNameAsIndex(IEnumerable<AgentOptions> agentOptions, IEnumerable<string> names)
         {
             _optionsMonitor.SetupGet(x => x.CurrentValue)
                 .Returns(new ManagerOptions {
                     Agents = agentOptions.ToList()
                 });
 
-            foreach (var url in urls)
+            foreach (var name in names)
             {
-                Assert.NotNull(_manager[url]);
+                Assert.NotNull(_manager[name]);
             }
         }
 
         [Theory]
         [MemberData(nameof(AgentOptionsTestData))]
-        public void SetsNameOnProxy(IEnumerable<AgentOptions> agentOptions, IEnumerable<string> urls)
+        public void CreatesAgentFromFactory(IEnumerable<AgentOptions> agentOptions, IEnumerable<string> names)
         {
             _optionsMonitor.SetupGet(x => x.CurrentValue)
                 .Returns(new ManagerOptions {
                     Agents = agentOptions.ToList()
                 });
 
-            foreach (var url in urls)
+            _ = _manager.ToList();
+
+            foreach (var name in names)
             {
-                Assert.Equal(url, _manager[url].Name);
+                _agentFactory.Verify(x => x.Create(name));
             }
         }
 
@@ -85,39 +96,37 @@ namespace Safir.Manager.Tests.Agents
         {
             yield return new object[] {
                 new AgentOptions[] {
-                    new() { BaseUrl = "https://example.com" }
+                    new() { Name = "test" }
                 },
-                new[] { "https://example.com" }
+                new[] { "test" }
             };
 
             yield return new object[] {
                 new AgentOptions[] {
-                    new() { BaseUrl = "https://example.com" },
-                    new() { BaseUrl = "https://example2.com" }
+                    new() { Name = "test" },
+                    new() { Name = "test2" }
                 },
                 new[] {
-                    "https://example.com",
-                    "https://example2.com"
+                    "test",
+                    "test2"
                 }
             };
         }
 
-        // TODO
         [Fact]
         public void CreatesNewAgentWhenOptionsChange()
         {
             _optionsMonitor.SetupGet(x => x.CurrentValue)
                 .Returns(new ManagerOptions { Agents = new() });
 
-            // Enumerate to trigger initial create
-            var _ = _manager.Count();
+            _ = _manager.ToList();
 
             Assert.NotNull(_changeCallback);
 
             _changeCallback!(new() {
                 Agents = new() {
                     new() {
-                        BaseUrl = "https://TestUrl69"
+                        Name = "https://TestUrl69"
                     }
                 }
             }, "doesn't matter");
