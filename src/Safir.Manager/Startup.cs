@@ -46,6 +46,7 @@ namespace Safir.Manager
             if (managerOptions.ProxyAgent)
             {
                 services.AddTransient<IAgents, AgentProxy>();
+                services.AddTransient<IEnumerable<IAgent>, AgentProxy>();
             }
             else
             {
