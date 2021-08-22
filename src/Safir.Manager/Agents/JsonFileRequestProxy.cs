@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -52,11 +53,18 @@ namespace Safir.Manager.Agents
             var file = ResponseFile(root, path, fileName);
 
             if (file == null) return default;
-            
-            await using var stream = File.OpenRead(file);
-            var result = await JsonSerializer.DeserializeAsync<T>(stream, _serializerOptions, cancellationToken);
-            _requestMap.TryAdd(Key(path, args), result);
-            return result;
+
+            try
+            {
+                await using var stream = File.OpenRead(file);
+                var result = await JsonSerializer.DeserializeAsync<T>(stream, _serializerOptions, cancellationToken);
+                _requestMap.TryAdd(Key(path, args), result);
+                return result;
+            }
+            catch (Exception)
+            {
+                return default;
+            }
         }
 
         private static string Key(string path, object? args) => $"{path}({args})";
